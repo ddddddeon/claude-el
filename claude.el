@@ -1,4 +1,4 @@
-;;; obsidian-clip.el --- Clip code snippets to Obsidian notes  -*- lexical-binding: t; -*-
+;;; claude.el --- Claude-assisted editing in emacs  -*- lexical-binding: t; -*-
 
 ;; Author: Chris d'Eon 
 ;; Version: 0.1
