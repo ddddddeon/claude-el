@@ -65,15 +65,16 @@
               (buffer-substring (region-beginning) (region-end))
             (buffer-string)))
          (prompt-with-code (concat system "\n" code "\n" prompt))
-         (response (claude-parse-response (claude-make-request prompt-with-code))))
+         (response (claude-parse-response (claude-make-request prompt-with-code)))
+         (claude-buffer (get-buffer-create "claude")))
     (progn
       (when replace-p
         (if (use-region-p)
             (delete-region (region-beginning) (region-end))
           (delete-region (point-min) (point-max))))
       (when (not inline-p)
-        (get-buffer-create "claude")
-        (claude-split-pane)
+        (unless (get-buffer-window claude-buffer)
+          (claude-split-pane))
         (switch-to-buffer "claude"))
       (insert (concat response "\n")))))
 
