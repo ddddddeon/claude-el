@@ -57,11 +57,17 @@
   text))
 
 (defun claude-build-output (prompt response inline-p)
-  (let ((separator (make-string (min 80 (length prompt)) ?=)))
-    (concat (if (not inline-p)
-                (concat separator "\n" prompt "\n" separator "\n\n")
-              "")
-            response "\n\n")))
+  (let* ((separator (make-string (min 80 (length prompt)) ?=))
+         (header
+          (if (not inline-p)
+              (concat separator
+                      "\n"
+                      prompt
+                      "\n"
+                      separator
+                      "\n\n")
+            "")))
+    (concat header response "\n\n")))
 
 (defun claude-prompt (prompt replace-p inline-p)
   (let* ((system (if inline-p
@@ -89,9 +95,11 @@
       (other-window 1))))
 
 ;;;###autoload
-(defun chatgpt-prompt-new-pane (prompt)
+(defun claude-prompt-new-pane (prompt)
   (interactive "s> ")
-  (claude-prompt prompt nil nil))
+  (progn
+    (claude-prompt prompt nil nil)
+    (deactivate-mark)))
 
 ;;;###autoload
 (defun claude-autocomplete ()
