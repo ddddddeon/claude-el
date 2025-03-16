@@ -56,6 +56,13 @@
          (text (cdr (assoc 'text text-object))))
   text))
 
+(defun claude-build-output (prompt response inline-p)
+  (let ((separator (make-string (min 80 (length prompt)) ?=)))
+    (concat (if (not inline-p)
+                (concat separator "\n" prompt "\n" separator "\n\n")
+              "")
+            response "\n\n")))
+
 (defun claude-prompt (prompt replace-p inline-p)
   (let* ((system (if inline-p
                      claude-inline-prompt
@@ -73,18 +80,16 @@
             (delete-region (region-beginning) (region-end))
           (delete-region (point-min) (point-max))))
       (when (not inline-p)
-        (unless (get-buffer-window claude-buffer)
+        (if (get-buffer-window claude-buffer)
+            (other-window 1)
           (claude-split-pane))
-        (switch-to-buffer "claude"))
-      (insert (concat response "\n")))))
+        (switch-to-buffer "claude")
+        (goto-char (point-max)))
+      (insert (claude-build-output prompt response inline-p))
+      (other-window 1))))
 
 ;;;###autoload
-(defun claude-prompt-inline (prompt)
-  (interactive "s> ")
-  (claude-prompt prompt t t))
-
-;;;###autoload
-(defun claude-prompt-new-pane (prompt)
+(defun chatgpt-prompt-new-pane (prompt)
   (interactive "s> ")
   (claude-prompt prompt nil nil))
 
