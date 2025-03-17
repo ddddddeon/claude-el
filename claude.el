@@ -95,6 +95,14 @@
       (other-window 1))))
 
 ;;;###autoload
+(defun claude-prompt-inline (prompt)
+  (interactive "s> ")
+  (progn
+    (claude-prompt prompt t t)
+    (deactivate-mark)))
+
+
+;;;###autoload
 (defun claude-prompt-new-pane (prompt)
   (interactive "s> ")
   (progn
