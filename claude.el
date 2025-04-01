@@ -46,7 +46,7 @@
       (max_tokens . 4096)
       (messages . [((role . "user")
                     (content . ,message))]))))
-
+;; TODO add support for this response: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}
 (defun claude-parse-response (response)
   (let* ((json-data (json-parse-string response :object-type 'alist))
          (content (cdr (assoc 'content json-data)))
@@ -80,19 +80,21 @@
          (prompt-with-code (concat system "\n" code "\n" prompt))
          (response (claude-parse-response (claude-make-request prompt-with-code)))
          (claude-buffer (get-buffer-create "claude")))
-    (progn
-      (when replace-p
-        (if (use-region-p)
-            (delete-region (region-beginning) (region-end))
-          (delete-region (point-min) (point-max))))
-      (when (not inline-p)
-        (if (get-buffer-window claude-buffer)
-            (other-window 1)
-          (claude-split-pane))
-        (switch-to-buffer "claude")
-        (goto-char (point-max)))
-      (insert (claude-build-output prompt response inline-p))
-      (other-window 1))))
+    (if (not response)
+        (message "API Error")
+      (progn
+        (when replace-p
+          (if (use-region-p)
+              (delete-region (region-beginning) (region-end))
+            (delete-region (point-min) (point-max))))
+        (when (not inline-p)
+          (if (get-buffer-window claude-buffer)
+              (other-window 1)
+            (claude-split-pane))
+          (switch-to-buffer "claude")
+          (goto-char (point-max)))
+        (insert (claude-build-output prompt response inline-p))
+        (other-window 1)))))
 
 ;;;###autoload
 (defun claude-prompt-inline (prompt)
